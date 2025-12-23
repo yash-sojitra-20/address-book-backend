@@ -23,5 +23,18 @@ func Setup() *gin.Engine {
 		auth.POST("/login", authController.Login)
 	}
 
+	contactRepo := repositories.NewContactRepository(db.DB)
+	contactService := services.NewContactService(contactRepo)
+	contactController := controllers.NewContactController(contactService)
+
+	contacts := r.Group("/contacts")
+	contacts.Use(middleware.AuthMiddleware())
+	{
+		contacts.POST("", contactController.Create)
+		contacts.GET("", contactController.GetAll)
+		contacts.PUT("/:id", contactController.Update)
+		contacts.DELETE("/:id", contactController.Delete)
+	}
+
 	return r
 }

@@ -10,6 +10,7 @@ import (
 var jwtSecret string
 func SetJwtSecret(c *config.Config){
 	jwtSecret = c.JwtSecret
+	// fmt.Println(jwtSecret)
 }
 
 func GenerateToken(userID uint, userEmail string) (string, error) {
@@ -20,5 +21,6 @@ func GenerateToken(userID uint, userEmail string) (string, error) {
 	}
 
 	token:=jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// fmt.Println(jwtSecret)
 	return token.SignedString([]byte(jwtSecret))
 }

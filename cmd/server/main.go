@@ -17,12 +17,13 @@ func main() {
 	middleware.InitLogger()
 	defer middleware.Logger.Sync()
 
-	// Connect DB
-	db.Connect(cfg)
-	db.DB.AutoMigrate(&models.User{})
-
 	// Set JWT Secret
 	utils.SetJwtSecret(cfg)
+	middleware.SetJwtSecret(cfg)
+
+	// Connect DB
+	db.Connect(cfg)
+	db.DB.AutoMigrate(&models.User{},  &models.Contact{})
 
 	// Setup router
 	r := router.Setup()
