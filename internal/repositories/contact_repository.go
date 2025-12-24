@@ -39,3 +39,29 @@ func (r *ContactRepository) Update(contact *models.Contact) error {
 func (r *ContactRepository) Delete(contact *models.Contact) error {
 	return r.db.Delete(contact).Error // soft delete
 }
+
+// Query format:
+// GET /contacts?page=1&limit=10&city=Ahmedabad
+func (r *ContactRepository) FindPaginated(
+	userID uint,
+	page int,
+	limit int,
+	city string,
+) ([]models.Contact, error) {
+
+	offset := (page - 1) * limit
+
+	query := r.db.Where("user_id = ?", userID)
+
+	if city != "" {
+		query = query.Where("city = ?", city)
+	}
+
+	var contacts []models.Contact
+	err := query.
+		Limit(limit).
+		Offset(offset).
+		Find(&contacts).Error
+
+	return contacts, err
+}

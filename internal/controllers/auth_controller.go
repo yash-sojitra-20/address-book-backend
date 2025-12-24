@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yash-sojitra-20/address-book-backend/internal/services"
+	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
 type AuthController struct {
@@ -16,42 +17,50 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 }
 
 func (c *AuthController) Register(ctx *gin.Context) {
-	var req struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var req RegisterRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		utils.Error(ctx, 400, "invalid json")
+		return
+	}
+
+	if err := utils.Validate.Struct(req); err != nil {
+		utils.Error(ctx, 400, err.Error())
 		return
 	}
 
 	if err := c.authService.Register(req.Email, req.Password); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.Error(ctx, 400, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "user registered"})
+	utils.Success(ctx, http.StatusCreated, gin.H{"message": "user registered"})
+	// ctx.JSON(http.StatusCreated, gin.H{"message": "user registered"})
 }
 
 func (c *AuthController) Login(ctx *gin.Context) {
-	var req struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var req LoginRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		utils.Error(ctx, http.StatusBadRequest, "invalid request")
 		return
 	}
 
+	if err := utils.Validate.Struct(req); err != nil {
+		utils.Error(ctx, 400, err.Error())
+		return
+	}
+	
 	token, err := c.authService.Login(req.Email, req.Password)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		utils.Error(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
+	utils.Success(ctx, http.StatusOK, gin.H{
 		"token": token,
 	})
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"token": token,
+	// })
 }

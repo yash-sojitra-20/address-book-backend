@@ -63,3 +63,12 @@ func (s *ContactService) Delete(userID uint, id uint) error {
 
 	return s.contactRepo.Delete(contact)
 }
+
+func (s *ContactService) GetPaginated(
+	userID uint,
+	page int,
+	limit int,
+	city string,
+) ([]models.Contact, error) {
+	return s.contactRepo.FindPaginated(userID, page, limit, city)
+}

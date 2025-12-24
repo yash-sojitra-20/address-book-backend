@@ -17,6 +17,9 @@ func main() {
 	middleware.InitLogger()
 	defer middleware.Logger.Sync()
 
+	// Init validator
+	utils.InitValidator()
+
 	// Set JWT Secret
 	utils.SetJwtSecret(cfg)
 	middleware.SetJwtSecret(cfg)

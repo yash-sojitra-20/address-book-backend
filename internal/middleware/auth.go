@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/yash-sojitra-20/address-book-backend/internal/config"
+	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
 var jwtSecret string
@@ -19,13 +20,15 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+			utils.Error(c, http.StatusUnauthorized, "missing token")
+			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token format"})
+			utils.Error(c, http.StatusUnauthorized, "invalid token format")
+			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token format"})
 			return
 		}
 
@@ -37,7 +40,8 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			utils.Error(c, http.StatusUnauthorized, "invalid token")
+			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
 
