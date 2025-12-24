@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
@@ -12,13 +13,26 @@ import (
 func GenerateContactsCSV(userID uint, contacts []models.Contact) (string, error) {
 
 	timestamp := time.Now().Format("20060102_150405")
-	fileName := fmt.Sprintf(
-		"contacts_user_%d_%s.csv",
+
+	baseDir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	dir := filepath.Join(baseDir, "exports")
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := fmt.Sprintf(
+		"%s/contacts_user_%d_%s.csv",
+		dir,
 		userID,
 		timestamp,
 	)
 
-	file, err := os.Create(fileName)
+	file, err := os.Create(filePath)
 	if err != nil {
 		return "", err
 	}
@@ -53,5 +67,5 @@ func GenerateContactsCSV(userID uint, contacts []models.Contact) (string, error)
 		})
 	}
 
-	return fileName, nil
+	return filePath, nil
 }
