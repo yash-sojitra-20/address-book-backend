@@ -39,7 +39,8 @@ func Setup() *gin.Engine {
 	{
 		contacts.POST("", contactController.Create)
 		contacts.GET("", contactController.GetAll)
-		contacts.GET("/export", contactController.Export)
+		contacts.GET("/export/sync", contactController.Export)
+		contacts.GET("/export/async", contactController.ExportAsync)
 		contacts.PUT("/:id", contactController.Update)
 		contacts.DELETE("/:id", contactController.Delete)
 	}

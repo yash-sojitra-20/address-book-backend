@@ -169,3 +169,17 @@ func (c *ContactController) Export(ctx *gin.Context) {
 
 	utils.Success(ctx, http.StatusOK, "CSV sent to your email")
 }
+
+func (c *ContactController) ExportAsync(ctx *gin.Context) {
+	userID := ctx.GetUint("user_id")
+	userEmail := ctx.GetString("user_email")
+
+	// Start async export
+	c.service.ExportContactsAsync(userID, userEmail, c.cfg)
+
+	// Respond immediately
+	ctx.JSON(http.StatusAccepted, gin.H{
+		"success": true,
+		"message": "Export started. CSV will be emailed shortly.",
+	})
+}

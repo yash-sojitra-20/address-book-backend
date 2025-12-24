@@ -4,9 +4,11 @@ import (
 	"errors"
 
 	"github.com/yash-sojitra-20/address-book-backend/internal/config"
+	"github.com/yash-sojitra-20/address-book-backend/internal/middleware"
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 	"github.com/yash-sojitra-20/address-book-backend/internal/repositories"
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
+	"go.uber.org/zap"
 )
 
 type ContactService struct {
@@ -106,3 +108,61 @@ func (s *ContactService) ExportContacts(
 	)
 }
 
+func (s *ContactService) ExportContactsAsync(
+	userID uint,
+	userEmail string,
+	cfg *config.Config,
+) {
+
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				middleware.Logger.Error(
+					"panic in async export",
+					zap.Any("error", r),
+				)
+			}
+		}()
+
+		middleware.Logger.Info(
+			"starting async contact export",
+			zap.Uint("user_id", userID),
+		)
+
+		// 1. Fetch contacts
+		contacts, err := s.contactRepo.FindAllForExport(userID)
+		if err != nil {
+			middleware.Logger.Error("failed to fetch contacts", zap.Error(err))
+			return
+		}
+
+		// 2. Generate CSV
+		filePath, err := utils.GenerateContactsCSV(userID, contacts)
+		if err != nil {
+			middleware.Logger.Error("failed to generate csv", zap.Error(err))
+			return
+		}
+
+		// 3. Send email
+		err = utils.SendEmailWithAttachment(
+			cfg.SMTPHost,
+			cfg.SMTPPort,
+			cfg.SMTPUser,
+			cfg.SMTPPass,
+			userEmail,
+			"Your Contacts CSV Export",
+			"Attached is your contacts CSV file.",
+			filePath,
+		)
+		if err != nil {
+			middleware.Logger.Error("failed to send email", zap.Error(err))
+			return
+		}
+
+		middleware.Logger.Info(
+			"contact export completed",
+			zap.Uint("user_id", userID),
+			zap.String("file", filePath),
+		)
+	}()
+}
