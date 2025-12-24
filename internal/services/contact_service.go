@@ -3,8 +3,10 @@ package services
 import (
 	"errors"
 
+	"github.com/yash-sojitra-20/address-book-backend/internal/config"
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 	"github.com/yash-sojitra-20/address-book-backend/internal/repositories"
+	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
 type ContactService struct {
@@ -72,3 +74,35 @@ func (s *ContactService) GetPaginated(
 ) ([]models.Contact, error) {
 	return s.contactRepo.FindPaginated(userID, page, limit, city)
 }
+
+func (s *ContactService) ExportContacts(
+	userID uint,
+	userEmail string,
+	cfg *config.Config,
+) error {
+
+	// 1. Fetch contacts
+	contacts, err := s.contactRepo.FindAllForExport(userID)
+	if err != nil {
+		return err
+	}
+
+	// 2. Generate CSV
+	filePath, err := utils.GenerateContactsCSV(userID, contacts)
+	if err != nil {
+		return err
+	}
+
+	// 3. Send email with attachment
+	return utils.SendEmailWithAttachment(
+		cfg.SMTPHost,
+		cfg.SMTPPort,
+		cfg.SMTPUser,
+		cfg.SMTPPass,
+		userEmail,
+		"Contacts CSV Export",
+		"Please find attached your contacts CSV file.",
+		filePath,
+	)
+}
+

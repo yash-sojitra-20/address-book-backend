@@ -65,3 +65,11 @@ func (r *ContactRepository) FindPaginated(
 
 	return contacts, err
 }
+
+func (r *ContactRepository) FindAllForExport(userID uint) ([]models.Contact, error) {
+	var contacts []models.Contact
+	err := r.db.
+		Where("user_id = ?", userID).
+		Find(&contacts).Error
+	return contacts, err
+}

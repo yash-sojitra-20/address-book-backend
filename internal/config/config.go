@@ -15,6 +15,10 @@ type Config struct {
 	DBName     string
 	ServerPort string
 	JwtSecret string
+	SMTPUser string
+	SMTPPass string
+	SMTPHost string
+	SMTPPort string
 }
 
 func Load() *Config {
@@ -32,6 +36,10 @@ func Load() *Config {
 		DBName:     getEnv("DB_NAME"),
 		ServerPort: getEnv("SERVER_PORT"),
 		JwtSecret:  getEnv("JWT_SECRET"),
+		SMTPUser:  getEnv("SMTP_USER"),
+		SMTPPass:  getEnv("SMTP_PASS"),
+		SMTPHost:  getEnv("SMTP_HOST"),
+		SMTPPort:  getEnv("SMTP_PORT"),
 	}
 
 	log.Println("config loaded")

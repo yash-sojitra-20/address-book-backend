@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yash-sojitra-20/address-book-backend/internal/config"
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 	"github.com/yash-sojitra-20/address-book-backend/internal/services"
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
@@ -12,10 +13,11 @@ import (
 
 type ContactController struct {
 	service *services.ContactService
+	cfg *config.Config
 }
 
-func NewContactController(service *services.ContactService) *ContactController {
-	return &ContactController{service}
+func NewContactController(service *services.ContactService, cfg *config.Config) *ContactController {
+	return &ContactController{service, cfg}
 }
 
 func (c *ContactController) Create(ctx *gin.Context) {
@@ -154,4 +156,16 @@ func (c *ContactController) Delete(ctx *gin.Context) {
 
 	utils.Success(ctx, http.StatusOK, gin.H{"message": "contact deleted"})
 	// ctx.JSON(http.StatusOK, gin.H{"message": "contact deleted"})
+}
+
+func (c *ContactController) Export(ctx *gin.Context) {
+	userID := ctx.GetUint("user_id")
+	userEmail := ctx.GetString("user_email")
+
+	if err := c.service.ExportContacts(userID, userEmail, c.cfg); err != nil {
+		utils.Error(ctx, 500, "failed to export contacts")
+		return
+	}
+
+	utils.Success(ctx, http.StatusOK, "CSV sent to your email")
 }

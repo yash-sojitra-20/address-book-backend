@@ -24,6 +24,9 @@ func main() {
 	utils.SetJwtSecret(cfg)
 	middleware.SetJwtSecret(cfg)
 
+	// Set Config
+	router.SetConfig(cfg)
+
 	// Connect DB
 	db.Connect(cfg)
 	db.DB.AutoMigrate(&models.User{},  &models.Contact{})
