@@ -6,4 +6,7 @@ var Validate *validator.Validate
 
 func InitValidator() {
 	Validate = validator.New()
+
+	// Register custom validators
+	Validate.RegisterValidation("strong_password", StrongPassword)
 }
