@@ -10,7 +10,7 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type CreateContactRequest struct {
+type AddressRequest struct {
 	FirstName    string `json:"first_name" validate:"required"`
 	LastName     string `json:"last_name"`
 	Email        string `json:"email" validate:"omitempty,email"`
@@ -23,9 +23,8 @@ type CreateContactRequest struct {
 	Pincode      string `json:"pincode" validate:"required,len=6"`
 }
 
-
-type ContactResponse struct {
-	ID			 uint   `json:"id"`
+type AddressResponse struct {
+	ID           uint   `json:"id"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
 	Email        string `json:"email"`

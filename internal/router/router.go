@@ -11,7 +11,8 @@ import (
 )
 
 var cfg *config.Config
-func SetConfig(c *config.Config){
+
+func SetConfig(c *config.Config) {
 	cfg = c
 	// fmt.Println(jwtSecret)
 }
@@ -30,21 +31,21 @@ func Setup() *gin.Engine {
 		auth.POST("/login", authController.Login)
 	}
 
-	contactRepo := repositories.NewContactRepository(db.DB)
-	contactService := services.NewContactService(contactRepo)
-	contactController := controllers.NewContactController(contactService, cfg)
+	addressRepo := repositories.NewAddressRepository(db.DB)
+	addressService := services.NewAddressService(addressRepo)
+	addressController := controllers.NewAddressController(addressService, cfg)
 
-	contacts := r.Group("/contacts")
-	contacts.Use(middleware.AuthMiddleware())
-	contacts.Use(middleware.EnsureUserExistsMiddleware(userRepo))
+	addresses := r.Group("/addresses")
+	addresses.Use(middleware.AuthMiddleware())
+	addresses.Use(middleware.EnsureUserExistsMiddleware(userRepo))
 	{
-		contacts.POST("", contactController.Create)
-		contacts.GET("", contactController.GetAll)
-		contacts.GET("/:id", contactController.GetByID)
-		contacts.GET("/export/sync", contactController.Export)
-		contacts.GET("/export/async", contactController.ExportAsync)
-		contacts.PUT("/:id", contactController.Update)
-		contacts.DELETE("/:id", contactController.Delete)
+		addresses.POST("", addressController.Create)
+		addresses.GET("", addressController.GetAll)
+		addresses.GET("/:id", addressController.GetByID)
+		addresses.GET("/export/sync", addressController.Export)
+		addresses.GET("/export/async", addressController.ExportAsync)
+		addresses.PUT("/:id", addressController.Update)
+		addresses.DELETE("/:id", addressController.Delete)
 	}
 
 	return r

@@ -11,94 +11,94 @@ import (
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
-type ContactController struct {
-	service *services.ContactService
-	cfg *config.Config
+type AddressController struct {
+	service *services.AddressService
+	cfg     *config.Config
 }
 
-func NewContactController(service *services.ContactService, cfg *config.Config) *ContactController {
-	return &ContactController{service, cfg}
+func NewAddressController(service *services.AddressService, cfg *config.Config) *AddressController {
+	return &AddressController{service, cfg}
 }
 
-func (c *ContactController) Create(ctx *gin.Context) {
+func (c *AddressController) Create(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 
-	var contact models.Contact 
-	// var contact CreateContactRequest
-	if err := ctx.ShouldBindJSON(&contact); err != nil {
+	var address models.Address
+	// var address CreateAddressRequest
+	if err := ctx.ShouldBindJSON(&address); err != nil {
 		utils.Error(ctx, http.StatusBadRequest, "invalid request")
 		return
 	}
 
-	if err := utils.Validate.Struct(contact); err != nil {
+	if err := utils.Validate.Struct(address); err != nil {
 		utils.Error(ctx, 400, err.Error())
 		return
 	}
 
-	if err := c.service.Create(userID, &contact); err != nil {
+	if err := c.service.Create(userID, &address); err != nil {
 		utils.Error(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	utils.Success(ctx, http.StatusCreated, gin.H{
-		"Data": contact,
+		"Data": address,
 	})
-	// ctx.JSON(http.StatusCreated, contact)
+	// ctx.JSON(http.StatusCreated, address)
 }
 
-func (c *ContactController) GetAll(ctx *gin.Context) {
+func (c *AddressController) GetAll(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 
-	contacts, err := c.service.GetAll(userID)
+	addresses, err := c.service.GetAll(userID)
 	if err != nil {
 		utils.Error(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	utils.Success(ctx, http.StatusCreated, gin.H{
-		"Data": contacts,
+		"Data": addresses,
 	})
-	// ctx.JSON(http.StatusOK, contacts)
+	// ctx.JSON(http.StatusOK, addresses)
 }
 
-func (c *ContactController) GetByID(ctx *gin.Context) {
+func (c *AddressController) GetByID(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		utils.Error(ctx, http.StatusBadRequest, "invalid contact id")
+		utils.Error(ctx, http.StatusBadRequest, "invalid address id")
 		return
 	}
 
-	contact, err := c.service.GetByID(userID, uint(id))
+	address, err := c.service.GetByID(userID, uint(id))
 	if err != nil {
 		utils.Error(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
 	utils.Success(ctx, http.StatusOK, gin.H{
-		"data": contact,
+		"data": address,
 	})
 }
 
-// Pagination
-// func (c *ContactController) GetAll(ctx *gin.Context) {
+// // Pagination
+// func (c *AddressController) GetAll(ctx *gin.Context) {
 // 	userID := ctx.GetUint("user_id")
 
 // 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
 // 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 // 	city := ctx.Query("city")
 
-// 	contacts, err := c.service.GetPaginated(userID, page, limit, city)
+// 	addresses, err := c.service.GetPaginated(userID, page, limit, city)
 // 	if err != nil {
-// 		utils.Error(ctx, 500, "failed to fetch contacts")
+// 		utils.Error(ctx, 500, "failed to fetch addresses")
 // 		return
 // 	}
 
-// 	utils.Success(ctx, contacts)
+// 	utils.Success(ctx, 200, addresses)
 // }
 
-// Normal + Pagination 
-// func (c *ContactController) GetAll(ctx *gin.Context) {
+// // Normal + Pagination
+// func (c *AddressController) GetAll(ctx *gin.Context) {
 // 	userID := ctx.GetUint("user_id")
 
 // 	// Read query params
@@ -118,7 +118,7 @@ func (c *ContactController) GetByID(ctx *gin.Context) {
 // 			limit = 10
 // 		}
 
-// 		contacts, err := c.service.GetPaginated(userID, page, limit, city)
+// 		addresses, err := c.service.GetPaginated(userID, page, limit, city)
 // 		if err != nil {
 // 			utils.Error(ctx, http.StatusInternalServerError, err.Error())
 // 			return
@@ -127,44 +127,43 @@ func (c *ContactController) GetByID(ctx *gin.Context) {
 // 		utils.Success(ctx, http.StatusOK, gin.H{
 // 			"page":  page,
 // 			"limit": limit,
-// 			"data":  contacts,
+// 			"data":  addresses,
 // 		})
 // 		return
 // 	}
 
-// 	// Otherwise → fetch all contacts
-// 	contacts, err := c.service.GetAll(userID)
+// 	// Otherwise → fetch all addresses
+// 	addresses, err := c.service.GetAll(userID)
 // 	if err != nil {
 // 		utils.Error(ctx, http.StatusInternalServerError, err.Error())
 // 		return
 // 	}
 
 // 	utils.Success(ctx, http.StatusOK, gin.H{
-// 		"data": contacts,
+// 		"data": addresses,
 // 	})
 // }
 
-
-func (c *ContactController) Update(ctx *gin.Context) {
+func (c *AddressController) Update(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	var contact models.Contact
-	if err := ctx.ShouldBindJSON(&contact); err != nil {
+	var address models.Address
+	if err := ctx.ShouldBindJSON(&address); err != nil {
 		utils.Error(ctx, http.StatusBadRequest, "invalid request")
 		return
 	}
 
-	if err := c.service.Update(userID, uint(id), &contact); err != nil {
+	if err := c.service.Update(userID, uint(id), &address); err != nil {
 		utils.Error(ctx, http.StatusForbidden, err.Error())
 		return
 	}
 
-	utils.Success(ctx, http.StatusCreated, gin.H{"message": "contact updated"})
-	// ctx.JSON(http.StatusOK, gin.H{"message": "contact updated"})
+	utils.Success(ctx, http.StatusCreated, gin.H{"message": "address updated"})
+	// ctx.JSON(http.StatusOK, gin.H{"message": "address updated"})
 }
 
-func (c *ContactController) Delete(ctx *gin.Context) {
+func (c *AddressController) Delete(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
@@ -173,28 +172,28 @@ func (c *ContactController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	utils.Success(ctx, http.StatusOK, gin.H{"message": "contact deleted"})
-	// ctx.JSON(http.StatusOK, gin.H{"message": "contact deleted"})
+	utils.Success(ctx, http.StatusOK, gin.H{"message": "address deleted"})
+	// ctx.JSON(http.StatusOK, gin.H{"message": "address deleted"})
 }
 
-func (c *ContactController) Export(ctx *gin.Context) {
+func (c *AddressController) Export(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 	userEmail := ctx.GetString("user_email")
 
-	if err := c.service.ExportContacts(userID, userEmail, c.cfg); err != nil {
-		utils.Error(ctx, 500, "failed to export contacts")
+	if err := c.service.ExportAddresses(userID, userEmail, c.cfg); err != nil {
+		utils.Error(ctx, 500, "failed to export addresses")
 		return
 	}
 
 	utils.Success(ctx, http.StatusOK, "CSV sent to your email")
 }
 
-func (c *ContactController) ExportAsync(ctx *gin.Context) {
+func (c *AddressController) ExportAsync(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 	userEmail := ctx.GetString("user_email")
 
 	// Start async export
-	c.service.ExportContactsAsync(userID, userEmail, c.cfg)
+	c.service.ExportAddressesAsync(userID, userEmail, c.cfg)
 
 	// Respond immediately
 	ctx.JSON(http.StatusAccepted, gin.H{

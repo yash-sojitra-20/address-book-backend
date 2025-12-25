@@ -29,7 +29,7 @@ func main() {
 
 	// Connect DB
 	db.Connect(cfg)
-	db.DB.AutoMigrate(&models.User{},  &models.Contact{})
+	db.DB.AutoMigrate(&models.User{}, &models.Address{})
 
 	// Setup router
 	r := router.Setup()

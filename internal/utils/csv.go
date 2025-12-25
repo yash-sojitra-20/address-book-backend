@@ -10,7 +10,7 @@ import (
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 )
 
-func GenerateContactsCSV(userID uint, contacts []models.Contact) (string, error) {
+func GenerateAddressesCSV(userID uint, addresses []models.Address) (string, error) {
 
 	timestamp := time.Now().Format("20060102_150405")
 
@@ -26,7 +26,7 @@ func GenerateContactsCSV(userID uint, contacts []models.Contact) (string, error)
 	}
 
 	filePath := fmt.Sprintf(
-		"%s/contacts_user_%d_%s.csv",
+		"%s/addresses_user_%d_%s.csv",
 		dir,
 		userID,
 		timestamp,
@@ -54,7 +54,7 @@ func GenerateContactsCSV(userID uint, contacts []models.Contact) (string, error)
 	})
 
 	// Data
-	for _, c := range contacts {
+	for _, c := range addresses {
 		writer.Write([]string{
 			c.FirstName,
 			c.LastName,
