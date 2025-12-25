@@ -40,11 +40,15 @@ func (s *AuthService) Register(email, password string) error {
 func (s *AuthService) Login(email, password string) (string, error) {
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil {
-		return "", errors.New("invalid credentials")
+		return "",err
+	}
+
+	if user.Email == ""{
+		return "", errors.New("invalid credentials: Please correct Email")
 	}
 
 	if err := utils.ComparePassword(user.Password, password); err != nil {
-		return "", errors.New("invalid credentials")
+		return "", errors.New("invalid credentials: Please correct Password")
 	}
 
 	return utils.GenerateToken(user.ID, user.Email)

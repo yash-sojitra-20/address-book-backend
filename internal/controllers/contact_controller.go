@@ -61,6 +61,25 @@ func (c *ContactController) GetAll(ctx *gin.Context) {
 	// ctx.JSON(http.StatusOK, contacts)
 }
 
+func (c *ContactController) GetByID(ctx *gin.Context) {
+	userID := ctx.GetUint("user_id")
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		utils.Error(ctx, http.StatusBadRequest, "invalid contact id")
+		return
+	}
+
+	contact, err := c.service.GetByID(userID, uint(id))
+	if err != nil {
+		utils.Error(ctx, http.StatusNotFound, err.Error())
+		return
+	}
+
+	utils.Success(ctx, http.StatusOK, gin.H{
+		"data": contact,
+	})
+}
+
 // Pagination
 // func (c *ContactController) GetAll(ctx *gin.Context) {
 // 	userID := ctx.GetUint("user_id")

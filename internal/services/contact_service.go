@@ -24,14 +24,73 @@ func (s *ContactService) Create(userID uint, contact *models.Contact) error {
 	return s.contactRepo.Create(contact)
 }
 
-func (s *ContactService) GetAll(userID uint) ([]models.Contact, error) {
-	return s.contactRepo.FindAllByUser(userID)
+func (s *ContactService) GetAll(userID uint) ([]utils.ContactResponse, error) {
+	contacts, err := s.contactRepo.FindAllByUser(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Map Contact to ContactResponse
+	var result []utils.ContactResponse
+	for _, c := range contacts {
+		result = append(result, utils.ContactResponse{
+			ID:           c.ID,
+			FirstName:    c.FirstName,
+			LastName:     c.LastName,
+			Email:        c.Email,
+			Phone:        c.Phone,
+			AddressLine1: c.AddressLine1,
+			AddressLine2: c.AddressLine2,
+			City:         c.City,
+			State:        c.State,
+			Country:      c.Country,
+			Pincode:      c.Pincode,
+		})
+	}
+
+	return result, nil
 }
 
+func (s *ContactService) GetByID(userID, contactID uint) (*utils.ContactResponse, error) {
+	contact, err := s.contactRepo.FindByID(contactID)
+	if err != nil {
+		return nil, err
+	}
+
+	if contact.ID == 0 {
+		return nil, errors.New("contact not found")
+	}
+
+	// ownership check
+	if contact.UserID != userID {
+		return nil, errors.New("contact not found for this user")
+	}
+
+	// Map to DTO
+	resp := &utils.ContactResponse{
+		ID: 		  contact.ID,
+		FirstName:    contact.FirstName,
+		LastName:     contact.LastName,
+		Email:        contact.Email,
+		Phone:        contact.Phone,
+		AddressLine1: contact.AddressLine1,
+		AddressLine2: contact.AddressLine2,
+		City:         contact.City,
+		State:        contact.State,
+		Country:      contact.Country,
+		Pincode:      contact.Pincode,
+	}
+
+	return resp, nil
+}
 
 func (s *ContactService) Update(userID uint, id uint, updated *models.Contact) error {
 	contact, err := s.contactRepo.FindByID(id)
 	if err != nil {
+		return err
+	}
+
+	if contact.ID == 0 {
 		return errors.New("contact not found")
 	}
 
@@ -58,6 +117,10 @@ func (s *ContactService) Update(userID uint, id uint, updated *models.Contact) e
 func (s *ContactService) Delete(userID uint, id uint) error {
 	contact, err := s.contactRepo.FindByID(id)
 	if err != nil {
+		return err
+	}
+
+	if contact.ID == 0 {
 		return errors.New("contact not found")
 	}
 

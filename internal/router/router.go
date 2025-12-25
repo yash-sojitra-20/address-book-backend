@@ -36,9 +36,11 @@ func Setup() *gin.Engine {
 
 	contacts := r.Group("/contacts")
 	contacts.Use(middleware.AuthMiddleware())
+	contacts.Use(middleware.EnsureUserExistsMiddleware(userRepo))
 	{
 		contacts.POST("", contactController.Create)
 		contacts.GET("", contactController.GetAll)
+		contacts.GET("/:id", contactController.GetByID)
 		contacts.GET("/export/sync", contactController.Export)
 		contacts.GET("/export/async", contactController.ExportAsync)
 		contacts.PUT("/:id", contactController.Update)

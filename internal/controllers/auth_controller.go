@@ -17,7 +17,7 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 }
 
 func (c *AuthController) Register(ctx *gin.Context) {
-	var req RegisterRequest
+	var req utils.RegisterRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		utils.Error(ctx, 400, "invalid json")
@@ -39,7 +39,7 @@ func (c *AuthController) Register(ctx *gin.Context) {
 }
 
 func (c *AuthController) Login(ctx *gin.Context) {
-	var req LoginRequest
+	var req utils.LoginRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		utils.Error(ctx, http.StatusBadRequest, "invalid request")

@@ -45,6 +45,12 @@ func (r *UserRepository) ExistsByEmail(email string) (bool, error) {
 	return count > 0, err
 }
 
+func (r *UserRepository) ExistsByID(userID uint) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.User{}).Where("id=?", userID).Count(&count).Error
+	return count > 0, err
+}
+
 func IsNotFound(err error) bool {
 	return errors.Is(err, gorm.ErrRecordNotFound)
 }
