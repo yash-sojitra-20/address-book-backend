@@ -14,7 +14,7 @@ type AddressRequest struct {
 	FirstName    string `json:"first_name" validate:"required"`
 	LastName     string `json:"last_name"`
 	Email        string `json:"email" validate:"omitempty,email"`
-	Phone        string `json:"phone" validate:"required"`
+	Phone        string `json:"phone" validate:"required,numeric,len=10"`
 	AddressLine1 string `json:"address_line1" validate:"required"`
 	AddressLine2 string `json:"address_line2"`
 	City         string `json:"city" validate:"required"`

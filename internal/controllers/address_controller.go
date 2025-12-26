@@ -41,8 +41,12 @@ func (c *AddressController) Create(ctx *gin.Context) {
 	}
 
 	utils.Success(ctx, http.StatusCreated, gin.H{
-		"Data": address,
+		"Data": "address created",
 	})
+
+	// utils.Success(ctx, http.StatusCreated, gin.H{
+	// 	"Data": address,
+	// })
 	// ctx.JSON(http.StatusCreated, address)
 }
 

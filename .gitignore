@@ -21,3 +21,6 @@ bin/
 
 # CSV Export files
 /exports
+
+# log file
+app.log
