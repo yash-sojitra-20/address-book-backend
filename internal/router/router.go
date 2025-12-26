@@ -42,6 +42,7 @@ func Setup() *gin.Engine {
 		addresses.POST("", addressController.Create)
 		addresses.GET("", addressController.GetAll)
 		addresses.GET("/:id", addressController.GetByID)
+		addresses.GET("/export/custom", addressController.ExportCustom)
 		addresses.GET("/export/sync", addressController.Export)
 		addresses.GET("/export/async", addressController.ExportAsync)
 		addresses.PUT("/:id", addressController.Update)

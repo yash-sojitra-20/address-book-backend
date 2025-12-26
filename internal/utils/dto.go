@@ -36,3 +36,8 @@ type AddressResponse struct {
 	Country      string `json:"country"`
 	Pincode      string `json:"pincode"`
 }
+
+type CustomExportRequest struct {
+	Fields []string `json:"fields" validate:"required,min=1"`
+	SendTo string   `json:"send_to" validate:"required,email"`
+}

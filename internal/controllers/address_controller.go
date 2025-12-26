@@ -196,8 +196,34 @@ func (c *AddressController) ExportAsync(ctx *gin.Context) {
 	c.service.ExportAddressesAsync(userID, userEmail, c.cfg)
 
 	// Respond immediately
-	ctx.JSON(http.StatusAccepted, gin.H{
-		"success": true,
+	utils.Success(ctx, http.StatusAccepted, gin.H{
 		"message": "Export started. CSV will be emailed shortly.",
 	})
+	// ctx.JSON(http.StatusAccepted, gin.H{
+	// 	"success": true,
+	// 	"message": "Export started. CSV will be emailed shortly.",
+	// })
+}
+
+func (c *AddressController) ExportCustom(ctx *gin.Context) {
+	userID := ctx.GetUint("user_id")
+
+	var req utils.CustomExportRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		utils.Error(ctx, 400, "invalid request payload")
+		return
+	}
+	if err := utils.Validate.Struct(req); err != nil {
+		utils.Error(ctx, 400, err.Error())
+		return
+	}
+
+	c.service.ExportAddressesCustomAsync(userID, req.Fields, req.SendTo, c.cfg)
+
+	utils.Success(ctx, 202, gin.H{
+		"message": "Custom export started. CSV will be emailed shortly.",
+	})
+	// ctx.JSON(202, gin.H{
+	// 	"message": "Custom export started. You will receive an email shortly.",
+	// })
 }

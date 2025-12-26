@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/yash-sojitra-20/address-book-backend/internal/config"
+	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 	"github.com/yash-sojitra-20/address-book-backend/internal/repositories"
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
-	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
 	"go.uber.org/zap"
 )
 
@@ -224,6 +224,63 @@ func (s *AddressService) ExportAddressesAsync(
 
 		logger.Logger.Info(
 			"address export completed",
+			zap.Uint("user_id", userID),
+			zap.String("file", filePath),
+		)
+	}()
+}
+
+func (s *AddressService) ExportAddressesCustomAsync(
+	userID uint,
+	fields []string,
+	sendTo string,
+	cfg *config.Config,
+) {
+
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.Logger.Error("panic in async custom export", zap.Any("error", r))
+			}
+		}()
+
+		logger.Logger.Info("custom address export started", zap.Uint("user_id", userID))
+
+		// 1. Fetch all addresses for user
+		addresses, err := s.addressRepo.FindAllForExport(userID)
+		if err != nil {
+			logger.Logger.Error("failed to fetch addresses", zap.Error(err))
+			return
+		}
+
+		// 2. Convert addresses into [][]string based on requested fields
+		rows := utils.FilterAddressFields(addresses, fields)
+
+		// 3. Generate CSV from filtered data
+		filePath, err := utils.GenerateCustomAddressesCSV(userID, rows)
+		if err != nil {
+			logger.Logger.Error("failed to generate custom csv", zap.Error(err))
+			return
+		}
+
+		// 4. Email with attachment
+		err = utils.SendEmailWithAttachment(
+			cfg.SMTPHost,
+			cfg.SMTPPort,
+			cfg.SMTPUser,
+			cfg.SMTPPass,
+			sendTo,
+			"Your Custom Address CSV Export",
+			"Attached is the custom address report you requested.",
+			filePath,
+		)
+		if err != nil {
+			logger.Logger.Error("failed to send export email", zap.Error(err))
+			return
+		}
+
+		logger.Logger.Info(
+			"custom address export completed",
 			zap.Uint("user_id", userID),
 			zap.String("file", filePath),
 		)
