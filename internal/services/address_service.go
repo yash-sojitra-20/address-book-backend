@@ -131,15 +131,6 @@ func (s *AddressService) Delete(userID uint, id uint) error {
 	return s.addressRepo.Delete(address)
 }
 
-func (s *AddressService) GetPaginated(
-	userID uint,
-	page int,
-	limit int,
-	city string,
-) ([]models.Address, error) {
-	return s.addressRepo.FindPaginated(userID, page, limit, city)
-}
-
 func (s *AddressService) ExportAddresses(
 	userID uint,
 	userEmail string,
@@ -286,3 +277,45 @@ func (s *AddressService) ExportAddressesCustomAsync(
 		)
 	}()
 }
+
+func (s *AddressService) GetFilteredAddresses(
+	userID, page, limit int,
+	search, city, state, country string,
+) (utils.PaginatedResponse, error) {
+
+	addresses, total, err := s.addressRepo.FindFiltered(
+		uint(userID),
+		page, limit,
+		search, city, state, country,
+	)
+
+	if err != nil {
+		// fmt.Println("inside service:",err)
+		return utils.PaginatedResponse{}, err
+	}
+
+	var responseData []utils.AddressResponse
+	for _, a := range addresses {
+		responseData = append(responseData, utils.AddressResponse{
+			ID:           a.ID,
+			FirstName:    a.FirstName,
+			LastName:     a.LastName,
+			Email:        a.Email,
+			Phone:        a.Phone,
+			AddressLine1: a.AddressLine1,
+			AddressLine2: a.AddressLine2,
+			City:         a.City,
+			State:        a.State,
+			Country:      a.Country,
+			Pincode:      a.Pincode,
+		})
+	}
+
+	return utils.PaginatedResponse{
+		Page:  page,
+		Limit: limit,
+		Total: total,
+		Data:  responseData,
+	}, nil
+}
+

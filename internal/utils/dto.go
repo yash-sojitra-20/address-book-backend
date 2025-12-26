@@ -41,3 +41,10 @@ type CustomExportRequest struct {
 	Fields []string `json:"fields" validate:"required,min=1"`
 	SendTo string   `json:"send_to" validate:"required,email"`
 }
+
+type PaginatedResponse struct {
+	Page  int               `json:"page"`
+	Limit int               `json:"limit"`
+	Total int64             `json:"total"`
+	Data  []AddressResponse `json:"data"`
+}

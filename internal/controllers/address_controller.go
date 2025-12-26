@@ -80,70 +80,6 @@ func (c *AddressController) GetByID(ctx *gin.Context) {
 	})
 }
 
-// // Pagination
-// func (c *AddressController) GetAll(ctx *gin.Context) {
-// 	userID := ctx.GetUint("user_id")
-
-// 	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
-// 	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
-// 	city := ctx.Query("city")
-
-// 	addresses, err := c.service.GetPaginated(userID, page, limit, city)
-// 	if err != nil {
-// 		utils.Error(ctx, 500, "failed to fetch addresses")
-// 		return
-// 	}
-
-// 	utils.Success(ctx, 200, addresses)
-// }
-
-// // Normal + Pagination
-// func (c *AddressController) GetAll(ctx *gin.Context) {
-// 	userID := ctx.GetUint("user_id")
-
-// 	// Read query params
-// 	pageStr := ctx.Query("page")
-// 	limitStr := ctx.Query("limit")
-// 	city := ctx.Query("city")
-
-// 	// If pagination params exist → use paginated method
-// 	if pageStr != "" || limitStr != "" || city != "" {
-// 		page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
-// 		if err != nil {
-// 			page = 1
-// 		}
-
-// 		limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
-// 		if err != nil {
-// 			limit = 10
-// 		}
-
-// 		addresses, err := c.service.GetPaginated(userID, page, limit, city)
-// 		if err != nil {
-// 			utils.Error(ctx, http.StatusInternalServerError, err.Error())
-// 			return
-// 		}
-
-// 		utils.Success(ctx, http.StatusOK, gin.H{
-// 			"page":  page,
-// 			"limit": limit,
-// 			"data":  addresses,
-// 		})
-// 		return
-// 	}
-
-// 	// Otherwise → fetch all addresses
-// 	addresses, err := c.service.GetAll(userID)
-// 	if err != nil {
-// 		utils.Error(ctx, http.StatusInternalServerError, err.Error())
-// 		return
-// 	}
-
-// 	utils.Success(ctx, http.StatusOK, gin.H{
-// 		"data": addresses,
-// 	})
-// }
-
 func (c *AddressController) Update(ctx *gin.Context) {
 	userID := ctx.GetUint("user_id")
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -226,4 +162,27 @@ func (c *AddressController) ExportCustom(ctx *gin.Context) {
 	// ctx.JSON(202, gin.H{
 	// 	"message": "Custom export started. You will receive an email shortly.",
 	// })
+}
+
+func (c *AddressController) GetFiltered(ctx *gin.Context) {
+	userID := ctx.GetUint("user_id")
+
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+
+	search := ctx.Query("search")
+	city := ctx.Query("city")
+	state := ctx.Query("state")
+	country := ctx.Query("country")
+
+	result, err := c.service.GetFilteredAddresses(
+		int(userID), page, limit, search, city, state, country,
+	)
+
+	if err != nil {
+		utils.Error(ctx, 500, "failed to fetch addresses")
+		return
+	}
+
+	utils.Success(ctx, 200, result)
 }
