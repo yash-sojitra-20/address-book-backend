@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/yash-sojitra-20/address-book-backend/internal/config"
-	"github.com/yash-sojitra-20/address-book-backend/internal/middleware"
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 	"github.com/yash-sojitra-20/address-book-backend/internal/repositories"
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
+	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
 	"go.uber.org/zap"
 )
 
@@ -180,14 +180,14 @@ func (s *AddressService) ExportAddressesAsync(
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				middleware.Logger.Error(
+				logger.Logger.Error(
 					"panic in async export",
 					zap.Any("error", r),
 				)
 			}
 		}()
 
-		middleware.Logger.Info(
+		logger.Logger.Info(
 			"starting async address export",
 			zap.Uint("user_id", userID),
 		)
@@ -195,14 +195,14 @@ func (s *AddressService) ExportAddressesAsync(
 		// 1. Fetch addresses
 		addresses, err := s.addressRepo.FindAllForExport(userID)
 		if err != nil {
-			middleware.Logger.Error("failed to fetch addresses", zap.Error(err))
+			logger.Logger.Error("failed to fetch addresses", zap.Error(err))
 			return
 		}
 
 		// 2. Generate CSV
 		filePath, err := utils.GenerateAddressesCSV(userID, addresses)
 		if err != nil {
-			middleware.Logger.Error("failed to generate csv", zap.Error(err))
+			logger.Logger.Error("failed to generate csv", zap.Error(err))
 			return
 		}
 
@@ -218,11 +218,11 @@ func (s *AddressService) ExportAddressesAsync(
 			filePath,
 		)
 		if err != nil {
-			middleware.Logger.Error("failed to send email", zap.Error(err))
+			logger.Logger.Error("failed to send email", zap.Error(err))
 			return
 		}
 
-		middleware.Logger.Info(
+		logger.Logger.Info(
 			"address export completed",
 			zap.Uint("user_id", userID),
 			zap.String("file", filePath),

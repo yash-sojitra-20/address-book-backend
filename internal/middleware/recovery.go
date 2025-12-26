@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
+	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
 	"go.uber.org/zap"
 )
 
@@ -12,7 +13,7 @@ func GlobalRecovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				Logger.Error("panic recovered", zap.Any("error", err))
+				logger.Logger.Error("panic recovered", zap.Any("error", err))
 
 				utils.Error(c, http.StatusInternalServerError, "internal server error")
 				// c.JSON(http.StatusInternalServerError, gin.H{

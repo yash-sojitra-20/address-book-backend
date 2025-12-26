@@ -7,15 +7,16 @@ import (
 	"github.com/yash-sojitra-20/address-book-backend/internal/models"
 	"github.com/yash-sojitra-20/address-book-backend/internal/router"
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
+	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
 )
 
 func main() {
+	// Init logger
+	logger.InitLogger()
+	defer logger.Logger.Sync()
+
 	// Load config
 	cfg := config.Load()
-
-	// Init logger
-	middleware.InitLogger()
-	defer middleware.Logger.Sync()
 
 	// Init validator
 	utils.InitValidator()

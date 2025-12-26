@@ -2,9 +2,11 @@ package db
 
 import (
 	"fmt"
-	"log"
+	_"log"
 
 	"github.com/yash-sojitra-20/address-book-backend/internal/config"
+	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
+	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -23,9 +25,11 @@ func Connect(cfg *config.Config) {
 
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("failed to connect to database")
+		// log.Fatal("failed to connect to database")
+		logger.Logger.Fatal("failed to connect to database", zap.Error(err))
 	}
 
 	DB = database
-	log.Println("database connected")
+	// log.Println("database connected")
+	logger.Logger.Info("database connected")
 }
