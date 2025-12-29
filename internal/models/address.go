@@ -8,7 +8,7 @@ import (
 
 type Address struct {
 	ID           uint   `gorm:"primaryKey"`
-	UserID       uint   `gorm:"not null"`
+	UserID       uint   `gorm:"not null;index"`
 	FirstName    string `gorm:"not null" json:"first_name"`
 	LastName     string `json:"last_name"`
 	Email        string
@@ -22,5 +22,5 @@ type Address struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
