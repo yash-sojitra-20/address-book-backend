@@ -21,6 +21,8 @@ func Setup() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger(), middleware.GlobalRecovery())
 
+	r.Static("/downloads", "./exports")
+
 	userRepo := repositories.NewUserRepository(db.DB)
 	authService := services.NewAuthService(userRepo)
 	authController := controllers.NewAuthController(authService)

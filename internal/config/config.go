@@ -20,6 +20,7 @@ type Config struct {
 	SMTPPass string
 	SMTPHost string
 	SMTPPort string
+	AppURL string
 }
 
 func Load() *Config {
@@ -43,6 +44,7 @@ func Load() *Config {
 		SMTPPass:  getEnv("SMTP_PASS"),
 		SMTPHost:  getEnv("SMTP_HOST"),
 		SMTPPort:  getEnv("SMTP_PORT"),
+		AppURL:    getEnv("APP_URL"),
 	}
 
 	// log.Println("config loaded")

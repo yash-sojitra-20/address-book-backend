@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/yash-sojitra-20/address-book-backend/internal/config"
 	"github.com/yash-sojitra-20/address-book-backend/internal/logger"
@@ -248,11 +249,25 @@ func (s *AddressService) ExportAddressesCustomAsync(
 		rows := utils.FilterAddressFields(addresses, fields)
 
 		// 3. Generate CSV from filtered data
-		filePath, err := utils.GenerateCustomAddressesCSV(userID, rows)
+		filePath, fileName, err := utils.GenerateCustomAddressesCSV(userID, rows)
 		if err != nil {
 			logger.Logger.Error("failed to generate custom csv", zap.Error(err))
 			return
 		}
+
+		// Create download URL
+		downloadURL := fmt.Sprintf(
+			"%s/downloads/%s",
+			cfg.AppURL,
+			fileName,
+		)
+
+		// Email with ATTACHMENT + LINK
+		emailBody := fmt.Sprintf(
+			"Attached is the custom address report you requested.\n\n"+
+				"You can also download it using the link below:\n%s",
+			downloadURL,
+		)
 
 		// 4. Email with attachment
 		err = utils.SendEmailWithAttachment(
@@ -261,8 +276,8 @@ func (s *AddressService) ExportAddressesCustomAsync(
 			cfg.SMTPUser,
 			cfg.SMTPPass,
 			sendTo,
-			"Your Custom Address CSV Export",
-			"Attached is the custom address report you requested.",
+			"Custom Address CSV Export",
+			emailBody,
 			filePath,
 		)
 		if err != nil {
@@ -318,4 +333,3 @@ func (s *AddressService) GetFilteredAddresses(
 		Data:  responseData,
 	}, nil
 }
-
