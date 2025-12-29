@@ -12,6 +12,18 @@ import (
 	"go.uber.org/zap"
 )
 
+type IAddressService interface {
+	Create(userID uint, address *models.Address) error
+	GetAll(userID uint) ([]utils.AddressResponse, error)
+	GetByID(userID, addressID uint) (*utils.AddressResponse, error)
+	Update(userID uint, id uint, updated *models.Address) error
+	Delete(userID uint, id uint) error
+	ExportAddresses(userID uint, userEmail string, cfg *config.Config) error
+	ExportAddressesAsync(userID uint, userEmail string, cfg *config.Config)
+	ExportAddressesCustomAsync(userID uint, fields []string, sendTo string, cfg *config.Config)
+	GetFilteredAddresses(userID, page, limit int, search, city, state, country string) (utils.PaginatedResponse, error)
+}
+
 type AddressService struct {
 	addressRepo *repositories.AddressRepository
 }

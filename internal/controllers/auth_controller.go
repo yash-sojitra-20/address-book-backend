@@ -8,6 +8,11 @@ import (
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
+type IAuthController interface {
+	Register(ctx *gin.Context)
+	Login(ctx *gin.Context)
+}
+
 type AuthController struct {
 	authService *services.AuthService
 }

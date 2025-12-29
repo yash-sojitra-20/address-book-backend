@@ -7,6 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type IUserRepository interface {
+	Create(user *models.User) error
+	FindByEmail(email string) (*models.User, error)
+	ExistsByEmail(email string) (bool, error)
+	ExistsByID(userID uint) (bool, error)
+}
+
 type UserRepository struct {
 	db *gorm.DB
 }

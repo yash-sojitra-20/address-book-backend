@@ -11,6 +11,18 @@ import (
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
+type IAddressController interface {
+	Create(ctx *gin.Context)
+	GetAll(ctx *gin.Context)
+	GetByID(ctx *gin.Context)
+	Update(ctx *gin.Context)
+	Delete(ctx *gin.Context)
+	Export(ctx *gin.Context)
+	ExportAsync(ctx *gin.Context)
+	ExportCustom(ctx *gin.Context)
+	GetFiltered(ctx *gin.Context)
+}
+
 type AddressController struct {
 	service *services.AddressService
 	cfg     *config.Config

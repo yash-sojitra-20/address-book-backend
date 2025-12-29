@@ -8,6 +8,11 @@ import (
 	"github.com/yash-sojitra-20/address-book-backend/internal/utils"
 )
 
+type IAuthService interface {
+	Register(email, password string) error
+	Login(email, password string) (string, error)
+}
+
 type AuthService struct{
 	userRepo *repositories.UserRepository
 }

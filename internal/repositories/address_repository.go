@@ -6,6 +6,24 @@ import (
 	"gorm.io/gorm"
 )
 
+type IAddressRepository interface {
+	Create(address *models.Address) error
+	FindAllByUser(userID uint) ([]models.Address, error)
+	FindByID(id uint) (*models.Address, error)
+	Update(address *models.Address) error
+	Delete(address *models.Address) error
+	FindAllForExport(userID uint) ([]models.Address, error)
+	FindFiltered(
+		userID uint,
+		page int,
+		limit int,
+		search string,
+		city string,
+		state string,
+		country string,
+	) ([]models.Address, int64, error)
+}
+
 type AddressRepository struct {
 	db *gorm.DB
 }
